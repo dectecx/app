@@ -14,37 +14,31 @@ namespace WebApplication1.Repositories
             _context = context;
         }
 
-        public async Task UpsertStatesAsync(int userId, IEnumerable<WorkItemStateDto> states)
+        public async Task UpsertStatesAsync(int userId, IEnumerable<UserWorkItemState> statesToUpdate)
         {
-            var itemIds = states.Select(s => s.ItemId).ToList();
+            var workItemIds = statesToUpdate.Select(s => s.WorkItemId).ToList();
             var existingStates = await _context.UserWorkItemStates
-                .Where(s => s.UserId == userId && itemIds.Contains(s.WorkItemId))
+                .Where(s => s.UserId == userId && workItemIds.Contains(s.WorkItemId))
                 .ToListAsync();
 
-            foreach (var stateDto in states)
+            foreach (var stateToUpdate in statesToUpdate)
             {
-                var existingState = existingStates.FirstOrDefault(s => s.WorkItemId == stateDto.ItemId);
+                var existingState = existingStates.FirstOrDefault(s => s.WorkItemId == stateToUpdate.WorkItemId);
                 if (existingState != null)
                 {
                     // Update existing state
-                    existingState.IsChecked = stateDto.IsChecked;
-                    existingState.IsConfirmed = true; // Confirmation implies this
-                    existingState.UpdatedUser = userId.ToString(); // Or username, depending on policy
+                    existingState.IsConfirmed = stateToUpdate.IsConfirmed;
+                    existingState.IsChecked = true; // Or handle as needed
+                    existingState.UpdatedUser = userId.ToString(); // Assuming UpdatedUser is the user's ID
                     existingState.UpdatedTime = DateTime.UtcNow;
                 }
                 else
                 {
-                    // Create new state
-                    var newState = new UserWorkItemState
-                    {
-                        UserId = userId,
-                        WorkItemId = stateDto.ItemId,
-                        IsChecked = stateDto.IsChecked,
-                        IsConfirmed = true,
-                        CreatedUser = userId.ToString(),
-                        CreatedTime = DateTime.UtcNow
-                    };
-                    _context.UserWorkItemStates.Add(newState);
+                    // Add new state
+                    stateToUpdate.UserId = userId;
+                    stateToUpdate.CreatedUser = userId.ToString(); // Assuming CreatedUser is the user's ID
+                    stateToUpdate.CreatedTime = DateTime.UtcNow;
+                    _context.UserWorkItemStates.Add(stateToUpdate);
                 }
             }
 

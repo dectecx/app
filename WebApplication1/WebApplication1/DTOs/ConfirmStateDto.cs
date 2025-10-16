@@ -4,8 +4,8 @@ namespace WebApplication1.DTOs
 {
     public class WorkItemStateDto
     {
-        public int ItemId { get; set; }
-        public bool IsChecked { get; set; }
+        public int WorkItemId { get; set; }
+        public bool IsConfirmed { get; set; }
     }
 
     public class ConfirmStateDto

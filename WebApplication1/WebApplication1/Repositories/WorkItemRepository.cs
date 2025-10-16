@@ -18,15 +18,21 @@ namespace WebApplication1.Repositories
             return await _context.WorkItems.FindAsync(id);
         }
 
+        public async Task<List<WorkItem>> GetByIdsAsync(IEnumerable<int> ids)
+        {
+            return await _context.WorkItems.Where(w => ids.Contains(w.Id)).ToListAsync();
+        }
+
         public async Task<IEnumerable<WorkItem>> GetAllAsync()
         {
             return await _context.WorkItems.ToListAsync();
         }
 
-        public async Task AddAsync(WorkItem workItem)
+        public async Task<WorkItem> AddAsync(WorkItem workItem)
         {
-            await _context.WorkItems.AddAsync(workItem);
+            _context.WorkItems.Add(workItem);
             await _context.SaveChangesAsync();
+            return workItem;
         }
 
         public async Task UpdateAsync(WorkItem workItem)

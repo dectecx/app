@@ -31,7 +31,6 @@ namespace WebApplication1.Services
             {
                 Title = createDto.Title,
                 Description = createDto.Description,
-                Status = "New", // Default status
                 CreatedUser = createdByUser,
                 CreatedTime = DateTime.UtcNow
             };
@@ -52,7 +51,6 @@ namespace WebApplication1.Services
 
             workItem.Title = updateDto.Title ?? workItem.Title;
             workItem.Description = updateDto.Description ?? workItem.Description;
-            workItem.Status = updateDto.Status ?? workItem.Status;
             workItem.UpdatedUser = updatedByUser;
             workItem.UpdatedTime = DateTime.UtcNow;
 
@@ -71,7 +69,6 @@ namespace WebApplication1.Services
                 Id = workItem.Id,
                 Title = workItem.Title,
                 Description = workItem.Description,
-                Status = workItem.Status,
                 CreatedUser = workItem.CreatedUser,
                 CreatedTime = workItem.CreatedTime,
                 UpdatedUser = workItem.UpdatedUser,

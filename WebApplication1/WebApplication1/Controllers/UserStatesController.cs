@@ -22,23 +22,14 @@ namespace WebApplication1.Controllers
         [HttpPost("confirm")]
         public async Task<IActionResult> ConfirmStates([FromBody] ConfirmStateDto confirmStateDto)
         {
-            var userId = GetCurrentUserId();
-            await _userStateService.ConfirmStatesAsync(userId, confirmStateDto);
-            return NoContent();
-        }
-
-        private int GetCurrentUserId()
-        {
-            // This helper extracts the user ID from the token's claims.
-            // It's important that this claim is present in the token.
-            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (int.TryParse(userIdValue, out var userId))
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
             {
-                return userId;
+                return Unauthorized();
             }
-            // If the claim is missing or invalid, it indicates a problem with
-            // the token or authentication setup. Throwing an exception is appropriate.
-            throw new InvalidOperationException("User ID claim is missing or invalid.");
+
+            await _userStateService.ConfirmStatesAsync(userId, confirmStateDto);
+            return Ok();
         }
     }
 }

@@ -31,7 +31,6 @@ BEGIN
         [Id] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
         [Title] NVARCHAR(256) NULL,
         [Description] NVARCHAR(MAX) NULL,
-        [Status] NVARCHAR(50) NULL,
         [CreatedUser] NVARCHAR(256) NULL,
         [CreatedTime] DATETIME2 NOT NULL,
         [UpdatedUser] NVARCHAR(256) NULL,

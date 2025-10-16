@@ -16,7 +16,6 @@ namespace WebApplication1.Validators
         public UpdateWorkItemDtoValidator()
         {
             RuleFor(x => x.Title).MaximumLength(256);
-            RuleFor(x => x.Status).MaximumLength(50);
         }
     }
 }
