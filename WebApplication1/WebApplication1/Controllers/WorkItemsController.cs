@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebApplication1.Models;
-using WebApplication1.Repositories;
+using System.Security.Claims;
+using WebApplication1.DTOs;
+using WebApplication1.Services;
 
 namespace WebApplication1.Controllers
 {
@@ -10,26 +11,26 @@ namespace WebApplication1.Controllers
     [ApiController]
     public class WorkItemsController : ControllerBase
     {
-        private readonly IWorkItemRepository _workItemRepository;
+        private readonly IWorkItemService _workItemService;
 
-        public WorkItemsController(IWorkItemRepository workItemRepository)
+        public WorkItemsController(IWorkItemService workItemService)
         {
-            _workItemRepository = workItemRepository;
+            _workItemService = workItemService;
         }
 
         // GET: api/WorkItems
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<WorkItem>>> GetWorkItems()
+        public async Task<ActionResult<IEnumerable<WorkItemDto>>> GetWorkItems()
         {
-            var workItems = await _workItemRepository.GetAllAsync();
+            var workItems = await _workItemService.GetAllAsync();
             return Ok(workItems);
         }
 
         // GET: api/WorkItems/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<WorkItem>> GetWorkItem(int id)
+        public async Task<ActionResult<WorkItemDto>> GetWorkItem(int id)
         {
-            var workItem = await _workItemRepository.GetByIdAsync(id);
+            var workItem = await _workItemService.GetByIdAsync(id);
 
             if (workItem == null)
             {
@@ -41,42 +42,20 @@ namespace WebApplication1.Controllers
 
         // POST: api/WorkItems
         [HttpPost]
-        public async Task<ActionResult<WorkItem>> PostWorkItem(WorkItem workItem)
+        public async Task<ActionResult<WorkItemDto>> PostWorkItem(CreateWorkItemDto createDto)
         {
-            // Note: In a real app, you'd get the user from the HttpContext.
-            workItem.CreatedUser = "System"; // Placeholder
-            workItem.CreatedTime = DateTime.UtcNow;
-            workItem.Status = "New"; // Default status
-            
-            await _workItemRepository.AddAsync(workItem);
+            var user = GetCurrentUser();
+            var newWorkItem = await _workItemService.CreateAsync(createDto, user);
 
-            return CreatedAtAction(nameof(GetWorkItem), new { id = workItem.Id }, workItem);
+            return CreatedAtAction(nameof(GetWorkItem), new { id = newWorkItem.Id }, newWorkItem);
         }
 
         // PUT: api/WorkItems/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutWorkItem(int id, WorkItem workItem)
+        public async Task<IActionResult> PutWorkItem(int id, UpdateWorkItemDto updateDto)
         {
-            if (id != workItem.Id)
-            {
-                return BadRequest();
-            }
-
-            var existingWorkItem = await _workItemRepository.GetByIdAsync(id);
-            if (existingWorkItem == null)
-            {
-                return NotFound();
-            }
-
-            // Note: In a real app, you'd get the user from the HttpContext.
-            existingWorkItem.Title = workItem.Title;
-            existingWorkItem.Description = workItem.Description;
-            existingWorkItem.Status = workItem.Status;
-            existingWorkItem.UpdatedUser = "System"; // Placeholder
-            existingWorkItem.UpdatedTime = DateTime.UtcNow;
-
-            await _workItemRepository.UpdateAsync(existingWorkItem);
-
+            var user = GetCurrentUser();
+            await _workItemService.UpdateAsync(id, updateDto, user);
             return NoContent();
         }
 
@@ -84,15 +63,15 @@ namespace WebApplication1.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteWorkItem(int id)
         {
-            var workItem = await _workItemRepository.GetByIdAsync(id);
-            if (workItem == null)
-            {
-                return NotFound();
-            }
-
-            await _workItemRepository.DeleteAsync(id);
-
+            await _workItemService.DeleteAsync(id);
             return NoContent();
+        }
+
+        private string GetCurrentUser()
+        {
+            // This is a simplified way to get the user's name from the claims.
+            // In a real-world scenario, you might have a dedicated service for this.
+            return User.FindFirstValue(ClaimTypes.Name) ?? "Anonymous";
         }
     }
 }

@@ -39,6 +39,7 @@ builder.Services.AddScoped<IWorkItemRepository, WorkItemRepository>();
 // Add Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IWorkItemService, WorkItemService>();
 
 // Add FluentValidation
 builder.Services.AddControllers()
