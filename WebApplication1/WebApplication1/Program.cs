@@ -57,6 +57,10 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IWorkItemService, WorkItemService>();
 builder.Services.AddScoped<IUserStateService, UserStateService>();
+builder.Services.AddSingleton<ICacheService, MemoryCacheService>();
+
+// Add Caching
+builder.Services.AddMemoryCache();
 
 // Add FluentValidation
 builder.Services.AddControllers()
