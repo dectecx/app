@@ -75,6 +75,7 @@ try
     builder.Services.AddScoped<IWorkItemService, WorkItemService>();
     builder.Services.AddScoped<IUserStateService, UserStateService>();
     builder.Services.AddSingleton<ICacheService, MemoryCacheService>();
+    builder.Services.AddScoped<IRoleService, RoleService>();
 
     // Add Caching
     builder.Services.AddMemoryCache();

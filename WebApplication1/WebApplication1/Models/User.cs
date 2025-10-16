@@ -9,6 +9,9 @@ namespace WebApplication1.Models
         public DateTime CreatedTime { get; set; }
         public string? UpdatedUser { get; set; }
         public DateTime? UpdatedTime { get; set; }
+        
+        // 導航屬性
         public ICollection<UserWorkItemState>? UserWorkItemStates { get; set; }
+        public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
     }
 }

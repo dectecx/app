@@ -20,6 +20,7 @@ namespace WebApplication1.Controllers
 
         // GET: api/WorkItems
         [HttpGet]
+        [Authorize(Roles = "User,Admin")]
         public async Task<ActionResult<IEnumerable<WorkItemDto>>> GetWorkItems()
         {
             var userId = GetCurrentUserId();
@@ -33,6 +34,7 @@ namespace WebApplication1.Controllers
 
         // GET: api/WorkItems/5
         [HttpGet("{id}")]
+        [Authorize(Roles = "User,Admin")]
         public async Task<ActionResult<WorkItemDto>> GetWorkItem(int id)
         {
             var userId = GetCurrentUserId();
@@ -52,6 +54,7 @@ namespace WebApplication1.Controllers
 
         // POST: api/WorkItems
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<WorkItemDto>> PostWorkItem(CreateWorkItemDto createDto)
         {
             var username = GetCurrentUser();
@@ -62,6 +65,7 @@ namespace WebApplication1.Controllers
 
         // PUT: api/WorkItems/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutWorkItem(int id, UpdateWorkItemDto updateDto)
         {
             var username = GetCurrentUser();
@@ -71,6 +75,7 @@ namespace WebApplication1.Controllers
 
         // DELETE: api/WorkItems/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteWorkItem(int id)
         {
             await _workItemService.DeleteAsync(id);

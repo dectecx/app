@@ -20,6 +20,7 @@ namespace WebApplication1.Controllers
 
         // POST: api/user/states/confirm
         [HttpPost("confirm")]
+        [Authorize(Roles = "User,Admin")]
         public async Task<IActionResult> ConfirmStates([FromBody] ConfirmStateDto confirmStateDto)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

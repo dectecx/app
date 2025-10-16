@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using WebApplication1.Data;
 using WebApplication1.DTOs;
+using WebApplication1.Enums;
 using WebApplication1.Exceptions;
 using WebApplication1.Models;
 
@@ -27,7 +28,7 @@ namespace WebApplication1.Services
             _cacheService = cacheService;
         }
 
-        public async Task RegisterAsync(RegisterDto registerDto)
+        public async Task<User> RegisterAsync(RegisterDto registerDto)
         {
             var userExists = await _context.Users.AnyAsync(u => u.Username == registerDto.Username);
             if (userExists)
@@ -39,27 +40,52 @@ namespace WebApplication1.Services
             {
                 Username = registerDto.Username,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
-                CreatedUser = "System", // Placeholder
+                CreatedUser = registerDto.Username,
                 CreatedTime = DateTime.UtcNow
             };
 
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
+
+            // 為新使用者分配預設的 User 角色
+            var userRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "User");
+            if (userRole != null)
+            {
+                var userRoleAssignment = new UserRole
+                {
+                    UserId = user.UserId,
+                    RoleId = userRole.RoleId,
+                    AssignedTime = DateTime.UtcNow,
+                    AssignedBy = registerDto.Username
+                };
+                _context.UserRoles.Add(userRoleAssignment);
+                await _context.SaveChangesAsync();
+            }
+
+            return user;
         }
 
         public async Task<TokenResponseDto> LoginAsync(LoginDto loginDto)
         {
-            var user = await _context.Users.SingleOrDefaultAsync(u => u.Username == loginDto.Username);
+            var user = await _context.Users
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .SingleOrDefaultAsync(u => u.Username == loginDto.Username);
+
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
             {
                 throw new InvalidCredentialsException("Invalid username or password.");
             }
 
+            // 取得使用者的所有角色
+            var userRoles = user.UserRoles.Select(ur => ur.Role.Name).ToList();
+            var roleClaims = userRoles.Select(role => new Claim(ClaimTypes.Role, role));
+
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-                new Claim(ClaimTypes.Name, user.Username)
-            };
+                new Claim(ClaimTypes.Name, user.Username ?? "Unknown")
+            }.Concat(roleClaims).ToArray();
 
             return _tokenService.GenerateTokens(claims);
         }

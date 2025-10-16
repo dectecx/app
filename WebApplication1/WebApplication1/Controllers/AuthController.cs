@@ -31,8 +31,8 @@ namespace WebApplication1.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto model)
         {
-            await _authService.RegisterAsync(model);
-            return Ok(new { message = "Registration successful" });
+            var user = await _authService.RegisterAsync(model);
+            return Ok(new { message = "User registered successfully", userId = user.UserId });
         }
 
         // POST: api/auth/refresh
