@@ -1,3 +1,5 @@
+using WebApplication1.Enums;
+
 namespace WebApplication1.DTOs
 {
     public class WorkItemDto
@@ -5,6 +7,7 @@ namespace WebApplication1.DTOs
         public int Id { get; set; }
         public string? Title { get; set; }
         public string? Description { get; set; }
+        public ConfirmationStatus UserStatus { get; set; }
         public string? CreatedUser { get; set; }
         public DateTime CreatedTime { get; set; }
         public string? UpdatedUser { get; set; }

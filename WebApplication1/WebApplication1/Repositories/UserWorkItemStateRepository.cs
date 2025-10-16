@@ -44,5 +44,18 @@ namespace WebApplication1.Repositories
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<UserWorkItemState>> GetStatesByUserIdAsync(int userId)
+        {
+            return await _context.UserWorkItemStates
+                .Where(s => s.UserId == userId)
+                .ToListAsync();
+        }
+
+        public async Task<UserWorkItemState?> GetStateAsync(int userId, int workItemId)
+        {
+            return await _context.UserWorkItemStates
+                .FirstOrDefaultAsync(s => s.UserId == userId && s.WorkItemId == workItemId);
+        }
     }
 }

@@ -22,7 +22,12 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<WorkItemDto>>> GetWorkItems()
         {
-            var workItems = await _workItemService.GetAllAsync();
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            var workItems = await _workItemService.GetAllAsync(userId);
             return Ok(workItems);
         }
 
@@ -30,7 +35,12 @@ namespace WebApplication1.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<WorkItemDto>> GetWorkItem(int id)
         {
-            var workItem = await _workItemService.GetByIdAsync(id);
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            var workItem = await _workItemService.GetByIdAsync(id, userId);
 
             if (workItem == null)
             {
@@ -44,8 +54,8 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public async Task<ActionResult<WorkItemDto>> PostWorkItem(CreateWorkItemDto createDto)
         {
-            var user = GetCurrentUser();
-            var newWorkItem = await _workItemService.CreateAsync(createDto, user);
+            var username = GetCurrentUser();
+            var newWorkItem = await _workItemService.CreateAsync(createDto, username);
 
             return CreatedAtAction(nameof(GetWorkItem), new { id = newWorkItem.Id }, newWorkItem);
         }
@@ -54,8 +64,8 @@ namespace WebApplication1.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutWorkItem(int id, UpdateWorkItemDto updateDto)
         {
-            var user = GetCurrentUser();
-            await _workItemService.UpdateAsync(id, updateDto, user);
+            var username = GetCurrentUser();
+            await _workItemService.UpdateAsync(id, updateDto, username);
             return NoContent();
         }
 
@@ -69,9 +79,12 @@ namespace WebApplication1.Controllers
 
         private string GetCurrentUser()
         {
-            // This is a simplified way to get the user's name from the claims.
-            // In a real-world scenario, you might have a dedicated service for this.
-            return User.FindFirstValue(ClaimTypes.Name) ?? "Anonymous";
+            return User.FindFirstValue(ClaimTypes.Name) ?? "Unknown";
+        }
+
+        private string? GetCurrentUserId()
+        {
+            return User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
     }
 }
