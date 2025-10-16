@@ -78,9 +78,10 @@ erDiagram
     Users {
         int UserId PK
         string Username
-        string Email
         string PasswordHash
+        string CreatedUser
         datetime CreatedTime
+        string UpdatedUser
         datetime UpdatedTime
     }
     
@@ -95,31 +96,29 @@ erDiagram
     UserRoles {
         int UserId FK
         int RoleId FK
+        datetime AssignedTime
+        string AssignedBy
     }
     
     WorkItems {
-        int WorkItemId PK
+        int Id PK
         string Title
         string Description
-        string Status
-        string Priority
+        string CreatedUser
         datetime CreatedTime
+        string UpdatedUser
         datetime UpdatedTime
     }
     
     UserWorkItemStates {
+        int StateId PK
         int UserId FK
         int WorkItemId FK
-        string State
-        string Notes
+        boolean IsChecked
+        boolean IsConfirmed
+        string CreatedUser
         datetime CreatedTime
-    }
-    
-    Categories {
-        int CategoryId PK
-        string Name
-        string Description
-        datetime CreatedTime
+        string UpdatedUser
         datetime UpdatedTime
     }
     
@@ -208,9 +207,8 @@ flowchart TD
 
 ### 🗄️ 資料管理
 - 工作項目 CRUD 操作
-- 使用者狀態管理
-- 角色管理
-- 分類管理
+- 使用者狀態管理 (IsChecked, IsConfirmed)
+- 角色管理與使用者角色關聯
 - 開發環境測試資料 API
 
 ### 🐳 容器化部署
@@ -241,6 +239,10 @@ WorkItemListApp/
 │   │   ├── RedisCacheService.cs          # Redis 快取實作
 │   │   └── AuthService.cs                # 認證服務
 │   ├── Models/                            # 資料模型
+│   │   ├── User.cs                        # 使用者模型
+│   │   ├── Role.cs                        # 角色模型 (包含 UserRole)
+│   │   ├── WorkItem.cs                    # 工作項目模型
+│   │   └── UserWorkItemState.cs           # 使用者工作項目狀態模型
 │   ├── Data/                              # 資料存取層
 │   └── appsettings.json                   # 應用程式設定
 ├── db-scripts/                            # 資料庫腳本
