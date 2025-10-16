@@ -101,45 +101,4 @@ BEGIN
 END
 GO
 
--- 9. 插入預設角色資料
-PRINT N'開始插入預設角色資料...';
-
--- 檢查 Roles 資料表是否存在
-IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Roles')
-BEGIN
-    PRINT N'錯誤: Roles 資料表不存在！';
-    RETURN;
-END
-
--- 插入 User 角色
-IF NOT EXISTS (SELECT * FROM [dbo].[Roles] WHERE [Name] = N'User')
-BEGIN
-    INSERT INTO [dbo].[Roles] ([Name], [Description], [CreatedTime])
-    VALUES (N'User', N'前台使用者', GETUTCDATE());
-    PRINT N'✅ 已插入 User 角色';
-END
-ELSE
-BEGIN
-    PRINT N'ℹ️ User 角色已存在';
-END
-GO
-
--- 插入 Admin 角色
-IF NOT EXISTS (SELECT * FROM [dbo].[Roles] WHERE [Name] = N'Admin')
-BEGIN
-    INSERT INTO [dbo].[Roles] ([Name], [Description], [CreatedTime])
-    VALUES (N'Admin', N'後台管理員', GETUTCDATE());
-    PRINT N'✅ 已插入 Admin 角色';
-END
-ELSE
-BEGIN
-    PRINT N'ℹ️ Admin 角色已存在';
-END
-GO
-
--- 顯示最終結果
-PRINT N'📊 最終角色資料:';
-SELECT [RoleId], [Name], [Description], [CreatedTime] FROM [dbo].[Roles];
-GO
-
-PRINT N'🎉 資料庫與資料表建立完成！';
+PRINT N'Database and tables created successfully!';
