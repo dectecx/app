@@ -74,7 +74,15 @@ namespace WebApplication1.Services
             // Check if the refresh token is blacklisted
             if (_cacheService.Exists(refreshTokenRequestDto.RefreshToken))
             {
-                throw new InvalidRefreshTokenException("Invalid refresh token.");
+                throw new InvalidRefreshTokenException("Invalid refresh token (blacklisted).");
+            }
+            
+            // Validate the refresh token itself
+            var refreshTokenHandler = new JwtSecurityTokenHandler();
+            var refreshTokenPrincipal = refreshTokenHandler.ReadJwtToken(refreshTokenRequestDto.RefreshToken);
+            if (refreshTokenPrincipal.ValidTo < DateTime.UtcNow)
+            {
+                throw new InvalidRefreshTokenException("Invalid refresh token (expired).");
             }
 
             var principal = _tokenService.GetPrincipalFromExpiredToken(refreshTokenRequestDto.AccessToken);
@@ -83,9 +91,7 @@ namespace WebApplication1.Services
             var newTokens = _tokenService.GenerateTokens(principal.Claims);
 
             // Blacklist the old refresh token
-            var refreshTokenHandler = new JwtSecurityTokenHandler();
-            var oldRefreshToken = refreshTokenHandler.ReadJwtToken(refreshTokenRequestDto.RefreshToken);
-            var remainingLifetime = oldRefreshToken.ValidTo - DateTime.UtcNow;
+            var remainingLifetime = refreshTokenPrincipal.ValidTo - DateTime.UtcNow;
             if (remainingLifetime > TimeSpan.Zero)
             {
                 _cacheService.Set(refreshTokenRequestDto.RefreshToken, "blacklisted", remainingLifetime);

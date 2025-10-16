@@ -21,7 +21,7 @@ namespace WebApplication1.Services
             var accessToken = GenerateToken(claims, accessTokenExpiration);
 
             var refreshTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpirationMinutes"]));
-            var refreshToken = GenerateToken(claims, refreshTokenExpiration); // In a real app, refresh token might have fewer claims
+            var refreshToken = GenerateToken(claims, refreshTokenExpiration);
 
             return new TokenResponseDto
             {
