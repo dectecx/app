@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.DTOs;
 using WebApplication1.Services;
+using System.Security.Claims;
 
 namespace WebApplication1.Controllers
 {
@@ -32,6 +33,24 @@ namespace WebApplication1.Controllers
         {
             await _authService.RegisterAsync(model);
             return Ok(new { message = "Registration successful" });
+        }
+
+        // POST: api/auth/refresh
+        [AllowAnonymous]
+        [HttpPost("refresh")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto model)
+        {
+            var tokens = await _authService.RefreshTokenAsync(model);
+            return Ok(tokens);
+        }
+
+        // POST: api/auth/logout
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] LogoutRequestDto model)
+        {
+            await _authService.LogoutAsync(model.AccessToken, model.RefreshToken);
+            return Ok(new { message = "Logout successful" });
         }
     }
 }

@@ -6,5 +6,7 @@ namespace WebApplication1.Services
     {
         Task RegisterAsync(RegisterDto registerDto);
         Task<TokenResponseDto> LoginAsync(LoginDto loginDto);
+        Task<TokenResponseDto> RefreshTokenAsync(RefreshTokenRequestDto refreshTokenRequestDto);
+        Task LogoutAsync(string? accessToken, string? refreshToken);
     }
 }

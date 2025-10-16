@@ -27,6 +27,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<InvalidCredentialsExceptionHandler>();
 builder.Services.AddExceptionHandler<UserAlreadyExistsExceptionHandler>();
+builder.Services.AddExceptionHandler<InvalidRefreshTokenExceptionHandler>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 

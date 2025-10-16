@@ -6,5 +6,7 @@ namespace WebApplication1.Services
     public interface ITokenService
     {
         TokenResponseDto GenerateTokens(IEnumerable<Claim> claims);
+        string GenerateAccessToken(IEnumerable<Claim> claims);
+        ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
     }
 }
