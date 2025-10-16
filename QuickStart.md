@@ -124,8 +124,15 @@ dotnet run --project WebApplication1/WebApplication1 --launch-profile https
     - `GET /api/CacheTest/get/{key}`: 取得快取值
     - `DELETE /api/CacheTest/remove/{key}`: 移除快取值
     - `GET /api/CacheTest/exists/{key}`: 檢查快取鍵是否存在
+
+6.  **測試資料管理**: 使用 `/api/TestData` 端點來管理測試資料（**僅限開發環境**）：
+    - `POST /api/TestData/create-test-users`: 建立測試使用者 (admin/123456, user/123456)
+    - `POST /api/TestData/login-test-admin`: Admin 登入測試
+    - `POST /api/TestData/login-test-user`: User 登入測試
+    - `GET /api/TestData/test-users-status`: 檢查測試使用者狀態
+    - `DELETE /api/TestData/delete-test-users`: 刪除測試使用者
     
-    **注意**: CacheTestController 僅在開發環境中可用，生產環境會回傳404。
+    **注意**: TestDataController 和 CacheTestController 僅在開發環境中可用，生產環境會回傳404。
 
 ## 5. 如何停止 (Stopping the Project)
 
