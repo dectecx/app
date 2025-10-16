@@ -4,13 +4,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebApplication1.Data;
-using WebApplication1.Middleware;
+using WebApplication1.Handlers;
 using WebApplication1.Repositories;
 using WebApplication1.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<InvalidCredentialsExceptionHandler>();
+builder.Services.AddExceptionHandler<UserAlreadyExistsExceptionHandler>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
 
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -51,7 +56,7 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
