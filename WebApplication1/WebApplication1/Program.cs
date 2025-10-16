@@ -30,9 +30,23 @@ builder.Services.AddExceptionHandler<UserAlreadyExistsExceptionHandler>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 
-// Add DbContext
+// Add DbContext based on provider
+var provider = builder.Configuration.GetValue("DatabaseSettings:ProviderType", "SqlServer");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseInMemoryDatabase("WorkItemListApp"));
+{
+    switch (provider)
+    {
+        case "SqlServer":
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            break;
+        case "InMemory":
+            options.UseInMemoryDatabase("WorkItemListApp");
+            break;
+        default:
+            throw new Exception($"Unsupported provider: {provider}");
+    }
+});
 
 // Add Repository
 builder.Services.AddScoped<IWorkItemRepository, WorkItemRepository>();
