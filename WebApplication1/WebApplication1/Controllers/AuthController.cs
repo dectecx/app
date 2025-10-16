@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using WebApplication1.DTOs; // We will create this DTO later.
+using WebApplication1.DTOs;
+using WebApplication1.Services;
 
 namespace WebApplication1.Controllers
 {
@@ -7,19 +8,26 @@ namespace WebApplication1.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private readonly IAuthService _authService;
+
+        public AuthController(IAuthService authService)
+        {
+            _authService = authService;
+        }
+
         // POST: api/auth/login
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginDto model)
+        public async Task<IActionResult> Login([FromBody] LoginDto model)
         {
-            // TODO: Implement user login logic and JWT generation.
-            return Ok(new { token = "jwt_token_placeholder" });
+            var tokens = await _authService.LoginAsync(model);
+            return Ok(tokens);
         }
 
         // POST: api/auth/register
         [HttpPost("register")]
-        public IActionResult Register([FromBody] RegisterDto model)
+        public async Task<IActionResult> Register([FromBody] RegisterDto model)
         {
-            // TODO: Implement user registration logic.
+            await _authService.RegisterAsync(model);
             return Ok(new { message = "Registration successful" });
         }
     }
