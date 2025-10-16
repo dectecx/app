@@ -51,7 +51,7 @@ namespace WebApplication1.Services
             var userRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "User");
             if (userRole != null)
             {
-                var userRoleAssignment = new UserRole
+                var userRoleAssignment = new Models.UserRole
                 {
                     UserId = user.UserId,
                     RoleId = userRole.RoleId,
