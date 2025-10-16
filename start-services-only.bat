@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 >nul
-echo 正在啟動開發環境...
+echo 正在啟動資料庫和 Redis 服務（不含 Web API）...
 echo.
 
 echo 0. 停止既有的 Docker 容器...
@@ -26,10 +26,10 @@ if %ERRORLEVEL% EQU 0 (
     echo    - SQL Server: localhost:1434
     echo    - Redis: localhost:6379
     echo.
-    echo 4. 啟動 .NET Web API...
-    echo    Swagger UI: https://localhost:7194/swagger
+    echo 🚀 要啟動 Web API，請執行以下指令:
+    echo    dotnet run --project WebApplication1/WebApplication1 --launch-profile https
     echo.
-    dotnet run --project WebApplication1/WebApplication1 --launch-profile https
+    echo 📝 Swagger UI: https://localhost:7194/swagger
 ) else (
     echo.
     echo ❌ 資料庫初始化失敗！請檢查 SQL Server 是否正常啟動。
@@ -37,3 +37,7 @@ if %ERRORLEVEL% EQU 0 (
     echo sqlcmd -S localhost,1434 -U sa -P "yourStrong(!)Password123" -i "db-scripts\init.sql"
     pause
 )
+
+echo.
+echo 💡 提示: 要停止服務請執行 stop-services.bat
+pause
