@@ -63,5 +63,7 @@
     <Build Include="dbo\Tables\WorkItems.sql" />
     <Build Include="dbo\Tables\UserWorkItemStates.sql" />
     <Build Include="dbo\Tables\Users.sql" />
+    <Build Include="dbo\Tables\UserRoles.sql" />
+    <Build Include="dbo\Tables\Roles.sql" />
   </ItemGroup>
 </Project>
