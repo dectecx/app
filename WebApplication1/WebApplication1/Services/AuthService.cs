@@ -90,7 +90,7 @@ namespace WebApplication1.Services
             return _tokenService.GenerateTokens(claims);
         }
 
-        public Task<TokenResponseDto> RefreshTokenAsync(RefreshTokenRequestDto refreshTokenRequestDto)
+        public async Task<TokenResponseDto> RefreshTokenAsync(RefreshTokenRequestDto refreshTokenRequestDto)
         {
             if (string.IsNullOrEmpty(refreshTokenRequestDto.RefreshToken) || string.IsNullOrEmpty(refreshTokenRequestDto.AccessToken))
             {
@@ -98,7 +98,7 @@ namespace WebApplication1.Services
             }
 
             // Check if the refresh token is blacklisted
-            if (_cacheService.Exists(refreshTokenRequestDto.RefreshToken))
+            if (await _cacheService.ExistsAsync(refreshTokenRequestDto.RefreshToken))
             {
                 throw new InvalidRefreshTokenException("Invalid refresh token (blacklisted).");
             }
@@ -120,13 +120,13 @@ namespace WebApplication1.Services
             var remainingLifetime = refreshTokenPrincipal.ValidTo - DateTime.UtcNow;
             if (remainingLifetime > TimeSpan.Zero)
             {
-                _cacheService.Set(refreshTokenRequestDto.RefreshToken, "blacklisted", remainingLifetime);
+                await _cacheService.SetAsync(refreshTokenRequestDto.RefreshToken, "blacklisted", remainingLifetime);
             }
 
-            return Task.FromResult(newTokens);
+            return newTokens;
         }
 
-        public Task LogoutAsync(string? accessToken, string? refreshToken)
+        public async Task LogoutAsync(string? accessToken, string? refreshToken)
         {
             if (!string.IsNullOrEmpty(accessToken))
             {
@@ -135,7 +135,7 @@ namespace WebApplication1.Services
                 var remainingAccessLifetime = accessTokenObj.ValidTo - DateTime.UtcNow;
                 if (remainingAccessLifetime > TimeSpan.Zero)
                 {
-                    _cacheService.Set(accessToken, "blacklisted", remainingAccessLifetime);
+                    await _cacheService.SetAsync(accessToken, "blacklisted", remainingAccessLifetime);
                 }
             }
 
@@ -146,11 +146,9 @@ namespace WebApplication1.Services
                 var remainingRefreshLifetime = refreshTokenObj.ValidTo - DateTime.UtcNow;
                 if (remainingRefreshLifetime > TimeSpan.Zero)
                 {
-                    _cacheService.Set(refreshToken, "blacklisted", remainingRefreshLifetime);
+                    await _cacheService.SetAsync(refreshToken, "blacklisted", remainingRefreshLifetime);
                 }
             }
-
-            return Task.CompletedTask;
         }
     }
 }

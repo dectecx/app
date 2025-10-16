@@ -65,6 +65,27 @@ try
         }
     });
 
+    // Add Cache Service based on provider
+    var cacheProvider = builder.Configuration.GetValue("CacheSettings:ProviderType", "Memory");
+    
+    switch (cacheProvider)
+    {
+        case "Memory":
+            builder.Services.AddMemoryCache();
+            builder.Services.AddSingleton<ICacheService, MemoryCacheService>();
+            break;
+        case "Redis":
+            builder.Services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = builder.Configuration.GetConnectionString("Redis");
+                options.InstanceName = builder.Configuration["RedisSettings:InstanceName"];
+            });
+            builder.Services.AddSingleton<ICacheService, RedisCacheService>();
+            break;
+        default:
+            throw new Exception($"Unsupported cache provider: {cacheProvider}");
+    }
+
     // Add Repository
     builder.Services.AddScoped<IWorkItemRepository, WorkItemRepository>();
     builder.Services.AddScoped<IUserWorkItemStateRepository, UserWorkItemStateRepository>();
@@ -74,11 +95,7 @@ try
     builder.Services.AddScoped<ITokenService, TokenService>();
     builder.Services.AddScoped<IWorkItemService, WorkItemService>();
     builder.Services.AddScoped<IUserStateService, UserStateService>();
-    builder.Services.AddSingleton<ICacheService, MemoryCacheService>();
     builder.Services.AddScoped<IRoleService, RoleService>();
-
-    // Add Caching
-    builder.Services.AddMemoryCache();
 
     // Add FluentValidation
     builder.Services.AddControllers()
